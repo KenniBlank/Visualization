@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common2.h"
 
 // Functions:
 void ProcessInput(void);

@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common2.h"
 
 long double x[] = {WINDOW_WIDTH / 2, WINDOW_WIDTH/2 + 100, WINDOW_WIDTH / 2, WINDOW_WIDTH/ 2 - 100};
 long double y[] = {WINDOW_HEIGHT / 2 - 100, WINDOW_HEIGHT / 2, WINDOW_HEIGHT / 2 + 100, WINDOW_HEIGHT /2};
@@ -14,6 +14,8 @@ int angleIncrement = 10;
 
 int main(){
     totalPointOfX_Y = sizeof(x) / sizeof(x[0]);
+    if (LocalSetup() == false)
+        return 1;
     setup();
     while (gameIsRunning){
         // Limit the frames of the game to the frame cap
@@ -82,9 +84,9 @@ void Render(void){
     SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255); // Set background color to black
     SDL_RenderClear(Renderer);
 
-    SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255); // Set draw color to red
+    SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255); // Set draw color to white
 
-    // Axis
+    // X_Y Axis
     SDL_RenderDrawLine(Renderer, WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     SDL_RenderDrawLine(Renderer, 0, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT / 2);
 

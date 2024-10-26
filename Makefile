@@ -2,10 +2,10 @@ CFLAGS = -Wall -g -std=c99
 LIBS   = -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 
 ifeq ($(OS),Windows_NT)
-	GAME = "game.exe"
+	GAME = "Executable.exe"
 	CFLAGS += -L ./
 else
-	GAME = "game"
+	GAME = "Executable"
 endif
 
 all:
