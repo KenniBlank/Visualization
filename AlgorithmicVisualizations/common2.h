@@ -1,5 +1,5 @@
 #include "../common.h"
-#define totalPoints (3000)
+#define totalPoints (WINDOW_WIDTH)
 
 int changePerFrame = 120;
 
@@ -79,6 +79,31 @@ bool isSorted() {
     return true;
 }
 
+void fileHandling(float totalTime){
+    // Writing in the data for future use
+    FILE *file = fopen("data.md", "a");
+    const char *AlgorithmName = strrchr(SOURCE, '/'); // Find last '/'
+    if (AlgorithmName)
+        AlgorithmName++; // Move past the '/'
+    else
+        AlgorithmName = SOURCE; // No '/' found, SOURCE is the filename
+
+     // Create a modifiable copy of AlgorithmName for removing ".c"
+    char formattedAlgorithmName[100];
+    strncpy(formattedAlgorithmName, AlgorithmName, sizeof(formattedAlgorithmName) - 1);
+    formattedAlgorithmName[sizeof(formattedAlgorithmName) - 1] = '\0'; // Ensure null-termination
+
+    // Find and remove the .c extension if it exists
+    char *dot = strrchr(formattedAlgorithmName, '.');
+    if (dot && strcmp(dot, ".c") == 0) {
+        *dot = '\0'; // Terminate the string at the .c extension
+    }
+
+    AlgorithmName = formattedAlgorithmName;
+    fprintf(file, "%d, %d, %f, %s\n", totalPoints, changePerFrame, totalTime / 1000.0, AlgorithmName);
+    fclose(file);
+}
+
 int main(void){
     static float startTime = 0;
     static float totalTime = 0;
@@ -102,8 +127,6 @@ int main(void){
         }
         Render();
     }
-    FILE *file = fopen("data.md", "a");
-    fprintf(file, "%d, %d, %f, %s\n", totalPoints, changePerFrame,totalTime / 1000.0, SOURCE);
-    fclose(file);
     DestroyWindow();
+    fileHandling(totalTime);
 }
