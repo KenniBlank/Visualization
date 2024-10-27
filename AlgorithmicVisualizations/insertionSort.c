@@ -1,11 +1,11 @@
 #include "common2.h"
+
 void Update() {
-    // Insertion Sort with frame control
+    int insertions = 0;
     static int i = 1; // Track position between frames
     static int j = 0; // Inner loop position
-    int insertions = 0;
 
-    while (i < halfWindowWidth && insertions < changePerFrame) {
+    while (i < totalPoints && insertions < changePerFrame) {
         int key = lines[i].y;
 
         // If starting a new iteration, set j to i - 1
@@ -17,29 +17,13 @@ void Update() {
             j--;
             insertions++;
         }
-        
+
         lines[j + 1].y = key;
         i++;
         j = 0;
     }
-
-    // Reset `i` and `j` when sorting is complete
-    if (i >= halfWindowWidth) {
+    if (i >= totalPoints) {
         i = 1;
         j = 0;
     }
-}
-
-
-int main(void){
-    setup();
-    localSetup();
-    while (gameIsRunning){
-        ProcessInput();
-        if (play){
-            Update();
-            Render();
-        }
-    }
-    DestroyWindow();
 }

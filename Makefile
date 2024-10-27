@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g -std=c99
+CFLAGS = -Wall -g -std=c99 -DSOURCE=\"$(SOURCE)\"
 LIBS   = -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 
 ifeq ($(OS),Windows_NT)
