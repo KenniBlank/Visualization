@@ -1,7 +1,8 @@
 #include "../common.h"
+#include <time.h>
 #define totalPoints (WINDOW_WIDTH)
 
-int changePerFrame = 120;
+int changePerFrame = 10;
 
 typedef struct{
     int x, y;
@@ -75,7 +76,6 @@ bool isSorted() {
     for (int i = 1; i < totalPoints; i++)
         if (lines[i].y > lines[i - 1].y)
             return false;
-    printf("Sorted\n");
     return true;
 }
 
@@ -105,8 +105,8 @@ void fileHandling(float totalTime){
 }
 
 int main(void){
-    static float startTime = 0;
-    static float totalTime = 0;
+    static clock_t startTime = 0, endTime = 0;
+    static long double totalTime = 0;
     static bool sorted = false;
     setup();
     localSetup();
@@ -116,13 +116,14 @@ int main(void){
         sorted = isSorted();
         if (play){
             if (!sorted){
-                startTime = SDL_GetTicks();
+                startTime = clock();
                 Update();
-                totalTime += SDL_GetTicks() - startTime;
+                endTime = clock();
+                totalTime += (double)(endTime - startTime) / CLOCKS_PER_SEC;
             }
             if (sorted){
-                printf("\n\tTo sort %d values, it took %f seconds\n", totalPoints, totalTime / 1000.0);
-                gameIsRunning = false;
+                printf("\n\tTo sort %d values, it took %Lf seconds\n", totalPoints, (long double)totalTime / 1000.0);
+                play = false;
             }
         }
         Render();

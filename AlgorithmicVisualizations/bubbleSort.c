@@ -6,7 +6,7 @@ void Update(void) {
     static int j = 0;       // Track the inner loop index
     int changes = 0;
 
-    while (i < totalPoints - 1 && changes < changePerFrame) {
+    while (i < totalPoints - 1 && changes < changePerFrame){
         if (j < totalPoints - i - 1) {
             if (lines[j].y < lines[j + 1].y) {
                 int temp = lines[j].y;
