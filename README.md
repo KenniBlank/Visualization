@@ -19,7 +19,7 @@ Use case: "make SOURCE=nameOfFile.c"
     - You can Also change the speed of the rotation by using up and down arrows.  
     ```bash
     # Compile with:
-    make SOURCE=sineCosForRotation.c
+    make SOURCE=./MathematicalPatterns/sineCosForRotation.c
     ```
 
 - **complexNumberForRotation.c**
