@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "sdl_render.h": "c"
+        "sdl_render.h": "c",
+        "ioctl.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
