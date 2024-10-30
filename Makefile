@@ -19,3 +19,4 @@ else
 endif
 	./$(GAME)
 	rm ./$(GAME)
+	clear
