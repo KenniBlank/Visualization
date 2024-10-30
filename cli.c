@@ -4,7 +4,7 @@
 #include <time.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#define FPS (90.00)
+#define FPS (75.00)
 
 void Swap(int* a, int* b){
     int temp = *a;
@@ -50,21 +50,9 @@ selectionSort(int *array, int sizeOfArray){
 // }
 
 Sort(int *array, int sizeOfArray){
-    // return bubbleSort(array, sizeOfArray);
-    bool returnValue = selectionSort(array, sizeOfArray);
-    // return insertionSort(array, sizeOfArray);
-    if (returnValue){
-        system("clear");
-        // Delay For Visualization
-        clock_t start_time = clock(), endTime = 0;
-        while(true){
-            endTime = clock();
-            if ((endTime - start_time) / (double) CLOCKS_PER_SEC > (1.00/FPS))
-                break;
-        }
-    }
-
-    return returnValue;
+    bubbleSort(array, sizeOfArray);
+    // selectionSort(array, sizeOfArray);
+    // insertionSort(array, sizeOfArray);  
 }
 
 UnSort(int *array, int sizeOfArray){
@@ -83,6 +71,29 @@ UnSort(int *array, int sizeOfArray){
     return true;
 }
 
+bool IsIn(int* array, int arraySize, int value){
+    for (int i = 0; i < arraySize; i++)
+        if (array[i] == value)
+            return true;
+        else   
+            array[i] = value;
+    return false;
+}
+
+void timerOfSeconds(int delay_seconds){
+    clock_t start_time = clock();
+    double elapsed_time;
+    int array[delay_seconds];
+    while (true) {
+        elapsed_time = (clock() - start_time) / (double)CLOCKS_PER_SEC;
+        int time = (int)(delay_seconds - elapsed_time);
+        if (!IsIn(array, delay_seconds, time))
+            printf("%d...\n", time + 1);
+        if (elapsed_time >= delay_seconds)
+            break;
+    }
+}
+
 int main() {
     struct winsize terminalBounds;
 
@@ -90,7 +101,7 @@ int main() {
     int terminalHeight = terminalBounds.ws_row, terminalWidth = terminalBounds.ws_col;
 
     // Randomizer
-    srand(69);
+    srand(time(NULL));
     int lines[terminalWidth];
     lines[0] = rand() % terminalHeight;
     for (int i = 1; i < terminalWidth; i++)
@@ -122,10 +133,24 @@ int main() {
         }
 
         // Sorting Logic
-        if (Sorted)
+        if (Sorted){
             Sorted = !UnSort(lines, terminalWidth);
-        else
+            if (Sorted == false){
+                printf("The points have been Unsorted\nPress Enter Key To Sort the points again.\n");
+                char ch = getchar();
+                printf("Sorting in...\n");
+                timerOfSeconds(3);
+            }
+        }
+        else{
             Sorted = Sort(lines, terminalWidth);
+            if (Sorted == true){
+                printf("The points have been sorted\nPress Enter Key To Unsort the points again.\n");
+                char ch = getchar();
+                printf("UnSorting In ...\n");
+                timerOfSeconds(3);
+            }
+        }
 
         // Delay For Visualization
         clock_t start_time = clock(), endTime = 0;
