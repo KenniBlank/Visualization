@@ -4,7 +4,8 @@
 #include <time.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#define FPS (75.00)
+#include <termios.h>
+#define FPS (180.00)
 
 void Swap(int* a, int* b){
     int temp = *a;
@@ -12,7 +13,7 @@ void Swap(int* a, int* b){
     *b = temp;
 }
 
-bubbleSort(int *array, int sizeOfArray){
+bool bubbleSort(int *array, int sizeOfArray){
     static int i = 0;
     for (i; i < sizeOfArray; i++){
         for (int j = i + 1; j < sizeOfArray; j++){
@@ -26,7 +27,7 @@ bubbleSort(int *array, int sizeOfArray){
     return true;
 }
 
-selectionSort(int *array, int sizeOfArray){
+bool selectionSort(int *array, int sizeOfArray){
     static int i = 0;
     for (i; i < sizeOfArray; i++){
         int minIndex = i;
@@ -42,20 +43,22 @@ selectionSort(int *array, int sizeOfArray){
     return true;
 }
 
-// insertionSort(int* array, int sizeOfArray){
+// bool insertionSort(int* array, int sizeOfArray){
 //     static int i = sizeOfArray;
 //     for (i; i >= 0; i--){
 //         for (int j = 0;)
 //     }
 // }
 
-Sort(int *array, int sizeOfArray){
-    bubbleSort(array, sizeOfArray);
-    // selectionSort(array, sizeOfArray);
-    // insertionSort(array, sizeOfArray);  
+bool Sort(int *array, int sizeOfArray){
+    bool returnValue;
+    returnValue = bubbleSort(array, sizeOfArray);
+    // returnValue = selectionSort(array, sizeOfArray);
+    // returnValue = insertionSort(array, sizeOfArray);  
+    return returnValue;
 }
 
-UnSort(int *array, int sizeOfArray){
+bool UnSort(int *array, int sizeOfArray){
     static int i = 0;
     static int unSortCount = 0;
     for (; i < sizeOfArray; i++){
@@ -95,8 +98,19 @@ void timerOfSeconds(int delay_seconds){
 }
 
 int main() {
-    struct winsize terminalBounds;
+    struct termios old_termios, new_termios;
+    int c;
+    // Save the current terminal settings
+    tcgetattr(STDIN_FILENO, &old_termios);
 
+    // Modify the terminal settings to enable non-blocking input
+    new_termios = old_termios;
+    new_termios.c_lflag &= ~(ICANON | ECHO);
+    new_termios.c_cc[VMIN] = 1;
+    new_termios.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_termios);
+
+    struct winsize terminalBounds;
     ioctl(STDIN_FILENO, TIOCGWINSZ, &terminalBounds);
     int terminalHeight = terminalBounds.ws_row, terminalWidth = terminalBounds.ws_col;
 
@@ -136,18 +150,22 @@ int main() {
         if (Sorted){
             Sorted = !UnSort(lines, terminalWidth);
             if (Sorted == false){
-                printf("The points have been Unsorted\nPress Enter Key To Sort the points again.\n");
-                char ch = getchar();
-                printf("Sorting in...\n");
+                printf("The points are Unsorted\n\tPress Escape and Enter to exit or Any Other Key To Sort the Points");
+                c = getchar();
+                if (c == 27)
+                    break;
+                printf("Sorting the Points in...\n");
                 timerOfSeconds(3);
             }
         }
         else{
             Sorted = Sort(lines, terminalWidth);
             if (Sorted == true){
-                printf("The points have been sorted\nPress Enter Key To Unsort the points again.\n");
-                char ch = getchar();
-                printf("UnSorting In ...\n");
+                printf("The points are sorted\n\tPress Escape and Enter to exit or Any Other Key To UnSort the Points");
+                c = getchar();
+                if (c == 27)
+                    break;
+                printf("UnSorting the Points In ...\n");
                 timerOfSeconds(3);
             }
         }
@@ -161,6 +179,8 @@ int main() {
         }
         system("clear");
     }
+     // Restore Previous Terminal Configurations
     printf("\033[?25h");
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
     return 0;
 }

@@ -13,7 +13,7 @@ ifndef SOURCE
 	$(error SOURCE is not defined. Run 'make SOURCE=<file.c>')
 endif
 ifeq ($(SOURCE), cli.c)
-	gcc $(SOURCE) -o $(GAME)
+	gcc $(SOURCE) -o $(GAME) $(CFLAGS)
 else
 	gcc $(SOURCE) -o $(GAME) $(CFLAGS) $(LIBS)
 endif

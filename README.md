@@ -5,6 +5,11 @@ SDL2 Based Visualization of core concepts of programming and mathematics or anyt
 compile with Make file.  
 Use case: "make SOURCE=nameOfFile.c"  
 
+- If you Dont want to install SDL2
+    ```bash
+    make SOURCE=cli.h #use at the top directory
+    ```
+
 
 # Files:
 - **common.h**  
