@@ -13,7 +13,7 @@ void Swap(int* a, int* b){
     *b = temp;
 }
 
-bool bubbleSort(int *array, int sizeOfArray){
+bubbleSort(int *array, int sizeOfArray){
     static int i = 0;
     for (i; i < sizeOfArray; i++){
         for (int j = i + 1; j < sizeOfArray; j++){
@@ -27,7 +27,7 @@ bool bubbleSort(int *array, int sizeOfArray){
     return true;
 }
 
-bool selectionSort(int *array, int sizeOfArray){
+selectionSort(int *array, int sizeOfArray){
     static int i = 0;
     for (i; i < sizeOfArray; i++){
         int minIndex = i;
@@ -43,7 +43,7 @@ bool selectionSort(int *array, int sizeOfArray){
     return true;
 }
 
-// bool insertionSort(int* array, int sizeOfArray){
+// insertionSort(int* array, int sizeOfArray){
 //     static int i = sizeOfArray;
 //     for (i; i >= 0; i--){
 //         for (int j = 0;)
@@ -140,7 +140,7 @@ int main() {
         for (int i = 0; i <= greatest; i++){
             for (int j = 0; j < terminalWidth; j++)
                 if (i >= lines[j])
-                    printf(".");
+                    printf("|");
                 else
                     printf(" ");
             printf("\n");
