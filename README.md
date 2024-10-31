@@ -1,5 +1,5 @@
 # Visualization
-Visualization of core concepts of programming and mathematics or anything that I want to see.
+Visualization of core concepts of programming and mathematics or anything that I want to see. This was designed for me but its free for anyone else who wants to use it.
 
 Prerequirements:
 ```bash
@@ -36,3 +36,4 @@ Use case: "make SOURCE=nameOfFile.c"
 
 - **complexNumberForRotation.c**
     Lets See... Or Lets C...
+    (Still haven't grasphed the concept behind it)
