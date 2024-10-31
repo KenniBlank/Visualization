@@ -1,5 +1,12 @@
 # Visualization
-SDL2 Based Visualization of core concepts of programming and mathematics or anything that I want to see.
+Visualization of core concepts of programming and mathematics or anything that I want to see.
+
+Prerequirements:
+```bash
+sudo apt update
+sudo apt-get install libsdl2-dev
+sudo apt-get install gcc
+```
 
 - Usecase:  
 compile with Make file.  
