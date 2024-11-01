@@ -13,22 +13,38 @@ void Swap(int* a, int* b){
     *b = temp;
 }
 
-bubbleSort(int *array, int sizeOfArray){
+typedef struct{
+    bool trueFalse;
+    char nameOfFunction[100];
+} returnValueDataType;
+
+
+returnValueDataType bubbleSort(int *array, int sizeOfArray){
     static int i = 0;
+
+    returnValueDataType valueToReturnBack;
+    strncpy(valueToReturnBack.nameOfFunction, __func__, sizeof(valueToReturnBack.nameOfFunction) - 1);
+
     for (i; i < sizeOfArray; i++){
         for (int j = i + 1; j < sizeOfArray; j++){
             if (array[i] < array[j]){
                 Swap(&array[i], &array[j]);
-                return false;
+                valueToReturnBack.trueFalse = false;
+                return valueToReturnBack;
             }
         }
     }
     i = 0;
-    return true;
+    valueToReturnBack.trueFalse = true;
+    return valueToReturnBack;
 }
 
-selectionSort(int *array, int sizeOfArray){
+returnValueDataType selectionSort(int *array, int sizeOfArray){
     static int i = 0;
+
+    returnValueDataType valueToReturnBack;
+    strncpy(valueToReturnBack.nameOfFunction, __func__, sizeof(valueToReturnBack.nameOfFunction) - 1);
+
     for (i; i < sizeOfArray; i++){
         int minIndex = i;
         for (int j = i + 1; j < sizeOfArray; j++)
@@ -36,26 +52,32 @@ selectionSort(int *array, int sizeOfArray){
                 minIndex = j;
         if (minIndex != i){
             Swap(&array[i], &array[minIndex]);
-            return false;
+            valueToReturnBack.trueFalse = false;
+            return valueToReturnBack;
         }
     }
     i = 0;
-    return true;
+    valueToReturnBack.trueFalse = true;
+    return valueToReturnBack;
 }
 
-// insertionSort(int* array, int sizeOfArray){
+// returnValueDataType insertionSort(int* array, int sizeOfArray){
 //     static int i = sizeOfArray;
+//     returnValueDataType valueToReturnBack;
+//     strncpy(valueToReturnBack.nameOfFunction, __func__, sizeof(valueToReturnBack.nameOfFunction) - 1);
 //     for (i; i >= 0; i--){
 //         for (int j = 0;)
 //     }
 // }
 
-bool Sort(int *array, int sizeOfArray){
-    bool returnValue;
-    returnValue = bubbleSort(array, sizeOfArray);
-    // returnValue = selectionSort(array, sizeOfArray);
-    // returnValue = insertionSort(array, sizeOfArray);  
-    return returnValue;
+returnValueDataType Sort(int *array, int sizeOfArray){
+    returnValueDataType valueToReturnBack;
+
+    valueToReturnBack = bubbleSort(array, sizeOfArray);
+    // valeuToReturnBack = selectionSort(array, sizeOfArray);
+    // valeuToReturnBack = insertionSort(array, sizeOfArray);  
+
+    return valueToReturnBack;
 }
 
 bool UnSort(int *array, int sizeOfArray){
@@ -98,6 +120,8 @@ void timerOfSeconds(int delay_seconds){
 }
 
 int main() {
+    returnValueDataType valueFromFunction;
+
     struct termios old_termios, new_termios;
     int c;
     // Save the current terminal settings
@@ -149,6 +173,7 @@ int main() {
         // Sorting Logic
         if (Sorted){
             Sorted = !UnSort(lines, terminalWidth);
+
             if (Sorted == false){
                 printf("The points are Unsorted\n\tPress Escape and Enter to exit or Any Other Key To Sort the Points");
                 c = getchar();
@@ -159,12 +184,20 @@ int main() {
             }
         }
         else{
-            Sorted = Sort(lines, terminalWidth);
+            static double elapsed_time = 0;
+
+            clock_t startTime = clock();
+                valueFromFunction = Sort(lines, terminalWidth);
+                Sorted = valueFromFunction.trueFalse;
+            elapsed_time += (clock() - startTime) / (double)CLOCKS_PER_SEC;
+
             if (Sorted == true){
+                printf("It took %f time to sort %d points using %s algorithm\n", elapsed_time, terminalWidth, valueFromFunction.nameOfFunction);
                 printf("The points are sorted\n\tPress Escape and Enter to exit or Any Other Key To UnSort the Points");
                 c = getchar();
                 if (c == 27)
                     break;
+                elapsed_time = 0;
                 printf("UnSorting the Points In ...\n");
                 timerOfSeconds(3);
             }
@@ -177,6 +210,7 @@ int main() {
             if ((endTime - start_time) / (double) CLOCKS_PER_SEC > (1.00/FPS))
                 break;
         }
+        
         system("clear");
     }
      // Restore Previous Terminal Configurations
