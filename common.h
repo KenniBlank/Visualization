@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define WINDOW_WIDTH (600)
+#define WINDOW_WIDTH (700)
 #define WINDOW_HEIGHT (600)
 
 bool play = true;

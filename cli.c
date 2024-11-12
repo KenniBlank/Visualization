@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/ioctl.h>
@@ -164,7 +165,7 @@ int main() {
         for (int i = 0; i <= greatest; i++){
             for (int j = 0; j < terminalWidth; j++)
                 if (i >= lines[j])
-                    printf("|");
+                    printf(".");
                 else
                     printf(" ");
             printf("\n");
@@ -207,11 +208,10 @@ int main() {
         clock_t start_time = clock(), endTime = 0;
         while(true){
             endTime = clock();
-            if ((endTime - start_time) / (double) CLOCKS_PER_SEC > (1.00/FPS))
+            if (((endTime - start_time) / (double) CLOCKS_PER_SEC) >= (1.00/FPS))
                 break;
         }
-        
-        system("clear");
+        system("clear");        
     }
      // Restore Previous Terminal Configurations
     printf("\033[?25h");

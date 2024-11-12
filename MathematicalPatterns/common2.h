@@ -13,6 +13,7 @@ bool LocalSetup(void){
         fprintf(stderr,"Error: %s",SDL_GetError());
         return false;
     };
+    
     return true;
 }
 
