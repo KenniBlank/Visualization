@@ -1,10 +1,11 @@
 #include "common2.h"
 #define Znear 0.1f
-#define Zfar 1000.0f
+#define Zfar 100.0f
 
 typedef struct {
     float x, y, z;
 } vec3D;
+vec3D Camera;
 
 typedef struct {
     vec3D p[3];
@@ -14,6 +15,36 @@ typedef struct {
     float elements[4][4];
 } matrix4x4;
 matrix4x4 projectionMatrix;
+
+void swap(int *a, int *b){
+    int temp = *a; //temp holded the value from the pointer of a
+    *a = *b;
+    *b = temp;
+}
+
+void DrawLine(int x1, int y1, int x2, int y2){
+    bool greater = x1 * x1 + y1 * y1 > x2 * x2 + y2 * y2;
+    if (greater){
+        swap(&x1, &x2);
+        swap(&y1, &y2);
+    }
+
+    int m_new = 2 * (y2 - y1);
+    int slope_error_new = m_new - (x2 - x1);
+    for (int x = greater, y = y1; x <= x2; x++) {
+        SDL_RenderDrawPoint(Renderer, x, y);
+        slope_error_new += m_new;
+        if (slope_error_new >= 0) {
+            y++;
+            slope_error_new -= 2 * (x2 - x1);
+        }
+    }
+
+    if (greater){
+        swap(&x1, &x2);
+        swap(&y1, &y2);
+    }
+}
 
 
 void MultiplyMatrixVector(vec3D *i, vec3D *o, matrix4x4 *m) {
@@ -80,12 +111,6 @@ int main(){
         return 1;
     setup();
     initializeProjectionMatrix(&projectionMatrix);
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%f ", projectionMatrix.elements[i][j]);
-        }
-        printf("\n");
-    }
 
     while (gameIsRunning){
         // Limit the frames of the game to the frame cap
@@ -133,10 +158,16 @@ void Update(void){}
 
 
 void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
-    SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
     SDL_RenderDrawLine(Renderer, x1, y1, x2, y2);
     SDL_RenderDrawLine(Renderer, x2, y2, x3, y3);
     SDL_RenderDrawLine(Renderer, x3, y3, x1, y1);
+}
+
+void FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+    DrawTriangle(x1, y1, x2, y2, x3, y3);
+    SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
+    DrawLine(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 void Render(void){
@@ -147,7 +178,7 @@ void Render(void){
     matrix4x4 matRotZ, matRotX;
 
     float fTheta = SDL_GetTicks() * 0.001f; // Rotate 1 revolution per second
-    
+
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             matRotZ.elements[i][j] = (i == j) ? 1.0f : 0.0f; // Identity matrix
@@ -190,29 +221,54 @@ void Render(void){
             inputTriangle.p[k].z = triangleRotatedinZX.p[k].z + 3.0f;
         }
 
-        // Projection
-        triangle projectedTriangle;
-        MultiplyMatrixVector(&inputTriangle.p[0], &projectedTriangle.p[0], &projectionMatrix);
-        MultiplyMatrixVector(&inputTriangle.p[1], &projectedTriangle.p[1], &projectionMatrix);
-        MultiplyMatrixVector(&inputTriangle.p[2], &projectedTriangle.p[2], &projectionMatrix);
+        vec3D normal, line1, line2;
 
-        // Scale to VIEW
-        projectedTriangle.p[0].x += 1.0f; projectedTriangle.p[0].y += 1.0f;
-        projectedTriangle.p[1].x += 1.0f; projectedTriangle.p[1].y += 1.0f;
-        projectedTriangle.p[2].x += 1.0f; projectedTriangle.p[2].y += 1.0f;
+        line1.x = inputTriangle.p[1].x - inputTriangle.p[0].x;
+        line1.y = inputTriangle.p[1].y - inputTriangle.p[0].y;
+        line1.z = inputTriangle.p[1].z - inputTriangle.p[0].z;
 
-        projectedTriangle.p[0].x *= 0.5f * WINDOW_WIDTH; projectedTriangle.p[0].y *= 0.5f * WINDOW_HEIGHT;
-        projectedTriangle.p[1].x *= 0.5f * WINDOW_WIDTH; projectedTriangle.p[1].y *= 0.5f * WINDOW_HEIGHT;
-        projectedTriangle.p[2].x *= 0.5f * WINDOW_WIDTH; projectedTriangle.p[2].y *= 0.5f * WINDOW_HEIGHT;
+        line2.x = inputTriangle.p[2].x - inputTriangle.p[0].x;
+        line2.y = inputTriangle.p[2].y - inputTriangle.p[0].y;
+        line2.z = inputTriangle.p[2].z - inputTriangle.p[0].z;
+
+        normal.x = line1.y * line2.z - line1.z * line2.y;
+        normal.y = line1.z * line2.x - line1.x * line2.z;
+        normal.z = line1.x * line2.y - line1.y * line2.x;
+
+        // It's normally normal to normalise the normal
+        float l = sqrtf(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
+        normal.x /= l; normal.y /= l; normal.z /= l;
+
+        if(normal.x * (inputTriangle.p[0].x - Camera.x) +
+            normal.y * (inputTriangle.p[0].y - Camera.y) +
+            normal.z * (inputTriangle.p[0].z - Camera.z)
+        < 0.0f){
+            // Illumination
+            vec3D light_direction ={0.0f, 0.0f, -1.0f};
+            // Normalization
+            l = sqrt(light_direction.x *light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
+            light_direction.x /= l;
+            light_direction.y /= l;
+            light_direction.z /= 1;
+
+            // Projection from 3d to 2d
+            triangle projectedTriangle;
+            for (int j = 0; j < 3; j++){
+                MultiplyMatrixVector(&inputTriangle.p[j], &projectedTriangle.p[j], &projectionMatrix);
+                // Scale to VIEW
+                projectedTriangle.p[j].x += 1.0f; projectedTriangle.p[j].y += 1.0f;
+                projectedTriangle.p[j].x *= 0.5f * WINDOW_WIDTH; projectedTriangle.p[j].y *= 0.5f * WINDOW_HEIGHT;
+            }
 
 
-        DrawTriangle(
-            projectedTriangle.p[0].x, projectedTriangle.p[0].y,
-            projectedTriangle.p[1].x, projectedTriangle.p[1].y,
-            projectedTriangle.p[2].x, projectedTriangle.p[2].y
-        );
+            // DrawTriangle(
+            FillTriangle(
+                projectedTriangle.p[0].x, projectedTriangle.p[0].y,
+                projectedTriangle.p[1].x, projectedTriangle.p[1].y,
+                projectedTriangle.p[2].x, projectedTriangle.p[2].y
+            );
 
+        }
     }
-    
     SDL_RenderPresent(Renderer);
 }
